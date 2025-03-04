@@ -3,6 +3,7 @@ pragma solidity ^0.8.24;
 
 import {IRebaseToken} from "./interfaces/IRebaseToken.sol";
 import {console} from "forge-std/console.sol";
+
 contract Vault {
     IRebaseToken private immutable i_rebaseToken;
 
@@ -28,7 +29,7 @@ contract Vault {
         }
         i_rebaseToken.burn(msg.sender, _amount);
         console.log("redeem amount:", _amount);
-         (bool success,) = payable(msg.sender).call{value: _amount}("");
+        (bool success,) = payable(msg.sender).call{value: _amount}("");
         if (!success) {
             revert Vault__RedeemFailed();
         }

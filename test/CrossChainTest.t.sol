@@ -18,7 +18,15 @@ contract CrossChainTest is Test {
     uint256 sepoliaFork;
     uint256 arbSepoliaFork;
 
+    RebaseToken sepoliaToken;
+    RebaseToken arbSepoliaToken;
+    Vault vault;
+    RebaseTokenPool sepoliaPool;
+    RebaseTokenPool arbSepoliaPool;
     CCIPLocalSimulatorFork ccipLocalSimulatorFork;
+
+    Register.NetworkDetails sepoliaNetworkDetails;
+    Register.NetworkDetails arbSepoliaNetworkDetails;
 
     function setUp() public {
         sepoliaFork = vm.createSelectFork("sepolia");
@@ -27,9 +35,9 @@ contract CrossChainTest is Test {
         ccipLocalSimulatorFork = new CCIPLocalSimulatorFork();
         vm.makePersistent(address(ccipLocalSimulatorFork));
 
-//1
-       sepoliaNetworkDetails = ccipLocalSimulatorFork.getNetworkDetails(block.chainId);
-    vm.startPrank(owner);
+        //1
+        sepoliaNetworkDetails = ccipLocalSimulatorFork.getNetworkDetails(block.chainid);
+        vm.startPrank(owner);
         sepoliaToken = new RebaseToken();
         vault = new Vault(IRebaseToken(address(sepoliaToken)));
         sepoliaPool = new RebaseTokenPool(
@@ -38,19 +46,16 @@ contract CrossChainTest is Test {
             sepoliaNetworkDetails.rmnProxyAddress,
             sepoliaNetworkDetails.routerAddress
         );
-                sepoliaToken.grantBurnAndMintRole(address(sepoliaPool));
-                sepoliaToken.grantBurnAndMintRole(address(vault));
- RegistryModuleOwnerCustom(sepoliaNetworkDetails.registryModuleOwnerCustomAddress).registerAdminViaOwner(
+        sepoliaToken.grantBurnAndMintRole(address(sepoliaPool));
+        sepoliaToken.grantBurnAndMintRole(address(vault));
+        RegistryModuleOwnerCustom(sepoliaNetworkDetails.registryModuleOwnerCustomAddress).registerAdminViaOwner(
             address(sepoliaToken)
         );
         vm.stopPrank();
 
-
-
-
-//2
+        //2
         vm.selectFork(arbSepoliaFork);
-        arbSepoliaNetworkDetails = ccipLocalSimulatorFork.getNetworkDetails(block.chainId);
+        arbSepoliaNetworkDetails = ccipLocalSimulatorFork.getNetworkDetails(block.chainid);
         arbSepoliaToken = new RebaseToken();
         arbSepoliaPool = new RebaseTokenPool(
             IERC20(address(arbSepoliaToken)),
@@ -58,7 +63,7 @@ contract CrossChainTest is Test {
             arbSepoliaNetworkDetails.rmnProxyAddress,
             arbSepoliaNetworkDetails.routerAddress
         );
-      
+
         //объркано
         arbSepoliaToken.grantBurnAndMintRole(address(arbSepoliaPool));
         RegistryModuleOwnerCustom(arbSepoliaNetworkDetails.registryModuleOwnerCustomAddress).registerAdminViaOwner(
@@ -66,34 +71,9 @@ contract CrossChainTest is Test {
         );
         TokenAdminRegistry(arbSepoliaNetworkDetails.tokenAdminRegistryAddress).acceptAdminRole(address(owner));
         TokenAdminRegistry(arbSepoliaNetworkDetails.tokenAdminRegistryAddress).setPool(
-            address(arbSepoliaToken),
-            address(arbSepoliaPool)
+            address(arbSepoliaToken), address(arbSepoliaPool)
         );
         vm.startPrank(owner);
         vm.stopPrank();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     }
-
-
-
-
-
-
 }

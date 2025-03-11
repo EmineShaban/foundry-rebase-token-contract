@@ -123,6 +123,7 @@ contract RebaseTokenTest is Test {
         vm.expectPartialRevert(IAccessControl.AccessControlUnauthorizedAccount.selector);
         rebaseToken.burn(user, 100);
     }
+
     function testGetPrincipleAmount(uint256 amount) public {
         amount = bound(amount, 1e5, type(uint96).max);
         vm.deal(user, amount);
@@ -131,8 +132,9 @@ contract RebaseTokenTest is Test {
         assertEq(rebaseToken.principleBalanceOf(user), amount);
         vm.warp(block.timestamp + 1 hours);
         assertEq(rebaseToken.principleBalanceOf(user), amount);
-           }
-    function testGetRebaseTokenAddress(uint256 newInterestRate) public view{
+    }
+
+    function testGetRebaseTokenAddress(uint256 newInterestRate) public view {
         assertEq(address(rebaseToken), address(vault.getRebaseTokenAddress()));
     }
 

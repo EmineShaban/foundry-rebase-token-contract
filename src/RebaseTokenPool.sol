@@ -13,24 +13,25 @@ contract RebaseTokenPool is TokenPool {
 
     function lockOrBurn(Pool.LockOrBurnInV1 calldata lockOrBurnIn)
         external
-        returns (Pool.LockOrBurnOutV1 memory lockOrBurnOut){
-            _validateLockOrBurn(lockOrBurnIn);
-            // address originalSender = abi.decode(, (address));
+        returns (Pool.LockOrBurnOutV1 memory lockOrBurnOut)
+    {
+        _validateLockOrBurn(lockOrBurnIn);
+        // address originalSender = abi.decode(, (address));
         uint256 userInterestRate = IRebaseToken(address(i_token)).getUserInterestRate(lockOrBurnIn.originalSender);
-            IRebaseToken(address(i_token)).burn(address(this), lockOrBurnIn.amount);
-            lockOrBurnOut = Pool.LockOrBurnOutV1({
-                destTokenAddress: getRemoteToken(lockOrBurnIn.remoteChainSelector),
-                destPoolData: abi.encode(userInterestRate)
-
-            });
-        }
+        IRebaseToken(address(i_token)).burn(address(this), lockOrBurnIn.amount);
+        lockOrBurnOut = Pool.LockOrBurnOutV1({
+            destTokenAddress: getRemoteToken(lockOrBurnIn.remoteChainSelector),
+            destPoolData: abi.encode(userInterestRate)
+        });
+    }
 
     function releaseOrMint(Pool.ReleaseOrMintInV1 calldata releaseOrMintIn)
         external
-        returns (Pool.ReleaseOrMintOutV1 memory){
-            _validateReleaseOrMint(releaseOrMintIn);
-            uint256 userInterestRate = abi.decode(releaseOrMintIn.sourcePoolAddress, (uint256));
-            IRebaseToken(address(i_token)).mint(releaseOrMintIn.receiver, releaseOrMintIn.amount, userInterestRate);
-            return Pool.ReleaseOrMintOutV1({destinationAmount: releaseOrMintIn.amount});
-        }
+        returns (Pool.ReleaseOrMintOutV1 memory)
+    {
+        _validateReleaseOrMint(releaseOrMintIn);
+        uint256 userInterestRate = abi.decode(releaseOrMintIn.sourcePoolAddress, (uint256));
+        IRebaseToken(address(i_token)).mint(releaseOrMintIn.receiver, releaseOrMintIn.amount, userInterestRate);
+        return Pool.ReleaseOrMintOutV1({destinationAmount: releaseOrMintIn.amount});
+    }
 }

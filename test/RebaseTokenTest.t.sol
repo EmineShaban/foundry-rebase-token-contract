@@ -25,6 +25,9 @@ contract RebaseTokenTest is Test {
 
     function addRewardsToValue(uint256 rewerdsAmount) public {
         (bool success,) = payable(address(vault)).call{value: rewerdsAmount}("");
+        if(!success){
+            return;
+        }
     }
 
     function testDepositLinear(uint256 amount) public {
@@ -134,7 +137,7 @@ contract RebaseTokenTest is Test {
         assertEq(rebaseToken.principleBalanceOf(user), amount);
     }
 
-    function testGetRebaseTokenAddress(uint256 newInterestRate) public view {
+    function testGetRebaseTokenAddress(/*uint256 newInterestRate*/) public view {
         assertEq(address(rebaseToken), address(vault.getRebaseTokenAddress()));
     }
 
